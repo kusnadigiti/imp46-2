@@ -19,6 +19,24 @@ export default function App() {
   const [currentView, setCurrentView] = useState<'landing' | 'admin'>('landing');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'loans' | 'repairs' | 'reports' | 'users'>('dashboard');
+  const [dbStatus, setDbStatus] = useState<{ connected: boolean; isFallback: boolean; type: string } | null>(null);
+
+  React.useEffect(() => {
+    const fetchDbStatus = async () => {
+      try {
+        const res = await fetch('/api/db-status');
+        if (res.ok) {
+          const data = await res.json();
+          setDbStatus(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch database status:", err);
+      }
+    };
+    fetchDbStatus();
+    const interval = setInterval(fetchDbStatus, 10000); // Poll every 10 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   if (currentView === 'landing') {
     return <LandingPage onAdminClick={() => setCurrentView('admin')} />;
@@ -113,12 +131,25 @@ export default function App() {
 
       {/* Status Footer Bar */}
       <footer className="h-8 w-full shrink-0 bg-white border-t border-slate-200 flex items-center px-8 justify-between text-[10px] text-slate-400 uppercase tracking-widest font-bold z-10 print:hidden">
-        <div className="flex gap-6">
-          <span>Sesi: <span className="text-slate-600">4j 21m aktif</span></span>
-          <span>Latensi DB: <span className="text-green-500 italic">4ms</span></span>
+        <div className="flex gap-6 items-center">
+          <span>Sesi: <span className="text-slate-600 font-bold">Aktif</span></span>
+          <span className="flex items-center gap-1.5">
+            Database: {dbStatus?.connected ? (
+              <span className="text-emerald-600 font-bold flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                NEON POSTGRESQL TERHUBUNG
+              </span>
+            ) : (
+              <span className="text-amber-600 font-bold flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                LOCAL FALLBACK (MEMORI)
+              </span>
+            )}
+          </span>
         </div>
-        <div>
-          Status Server XAMPP: <span className="text-blue-600">Online</span>
+        <div className="flex items-center gap-4">
+          {dbStatus?.type && <span className="text-slate-500 lowercase normal-case font-normal italic">({dbStatus.type})</span>}
+          <span>Status Server: <span className="text-blue-600 font-bold">Online</span></span>
         </div>
       </footer>
     </div>

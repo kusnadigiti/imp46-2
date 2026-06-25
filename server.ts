@@ -242,6 +242,22 @@ async function startServer() {
     console.error("Async database bootstrap failed:", err);
   });
 
+  // --- API Routes (Database Status Check) ---
+  app.get('/api/db-status', async (req, res) => {
+    if (postgresPool) {
+      try {
+        const client = await postgresPool.connect();
+        await client.query('SELECT 1');
+        client.release();
+        res.json({ connected: true, isFallback: false, type: 'Neon PostgreSQL' });
+      } catch (err: any) {
+        res.json({ connected: false, isFallback: true, type: `In-Memory Fallback (Koneksi Gagal: ${err.message})` });
+      }
+    } else {
+      res.json({ connected: false, isFallback: true, type: 'In-Memory Fallback (DATABASE_URL Belum Dikonfigurasi)' });
+    }
+  });
+
   // --- API Routes (Users) ---
   app.get('/api/users', async (req, res) => {
     if (postgresPool) {
