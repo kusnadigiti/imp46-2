@@ -32,7 +32,11 @@ export function RepairsList() {
         fetch('/api/repairs'),
         fetch('/api/inventory')
       ]);
-      if (repairsRes.ok && itemsRes.ok) {
+      const isJson = (res: Response) => {
+        const contentType = res.headers.get('content-type');
+        return !!(contentType && contentType.includes('application/json'));
+      };
+      if (repairsRes.ok && itemsRes.ok && isJson(repairsRes) && isJson(itemsRes)) {
         setRepairs(await repairsRes.json());
         setItems(await itemsRes.json());
       }

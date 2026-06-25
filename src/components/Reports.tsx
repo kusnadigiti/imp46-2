@@ -27,13 +27,22 @@ export function Reports() {
           fetch('/api/repairs')
         ]);
         
-        const itemsData = await itemsRes.json();
-        const loansData = await loansRes.json();
-        const repairsData = await repairsRes.json();
-        
-        setItems(itemsData);
-        setLoans(loansData);
-        setRepairs(repairsData);
+        const isJson = (res: Response) => {
+          const contentType = res.headers.get('content-type');
+          return !!(contentType && contentType.includes('application/json'));
+        };
+
+        if (itemsRes.ok && loansRes.ok && repairsRes.ok && isJson(itemsRes) && isJson(loansRes) && isJson(repairsRes)) {
+          const itemsData = await itemsRes.json();
+          const loansData = await loansRes.json();
+          const repairsData = await repairsRes.json();
+          
+          setItems(itemsData);
+          setLoans(loansData);
+          setRepairs(repairsData);
+        } else {
+          console.error("Some report endpoints returned non-JSON or error statuses");
+        }
       } catch (error) {
         console.error("Failed to fetch reports data:", error);
       } finally {

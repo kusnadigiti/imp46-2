@@ -26,7 +26,8 @@ function AppContent() {
     const fetchDbStatus = async () => {
       try {
         const res = await fetch('/api/db-status');
-        if (res.ok) {
+        const contentType = res.headers.get('content-type');
+        if (res.ok && contentType && contentType.includes('application/json')) {
           const data = await res.json();
           setDbStatus(data);
         }

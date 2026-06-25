@@ -32,7 +32,11 @@ export function LoansList() {
         fetch('/api/loans'),
         fetch('/api/inventory')
       ]);
-      if (loansRes.ok && itemsRes.ok) {
+      const isJson = (res: Response) => {
+        const contentType = res.headers.get('content-type');
+        return !!(contentType && contentType.includes('application/json'));
+      };
+      if (loansRes.ok && itemsRes.ok && isJson(loansRes) && isJson(itemsRes)) {
         setLoans(await loansRes.json());
         setItems(await itemsRes.json());
       }
@@ -52,7 +56,9 @@ export function LoansList() {
         toast.success(`Barang "${itemName}" berhasil dikembalikan.`, 'Pengembalian Barang');
         fetchData();
       } else {
-        const errorData = await res.json();
+        const contentType = res.headers.get('content-type');
+        const isJson = contentType && contentType.includes('application/json');
+        const errorData = isJson ? await res.json() : { error: 'Gagal memproses pengembalian.' };
         toast.error(errorData.error || 'Gagal memproses pengembalian.', 'Pengembalian Barang');
       }
     } catch (error) {
@@ -159,7 +165,9 @@ export function LoansList() {
         setIsModalOpen(false);
         fetchData();
       } else {
-        const errorData = await res.json();
+        const contentType = res.headers.get('content-type');
+        const isJson = contentType && contentType.includes('application/json');
+        const errorData = isJson ? await res.json() : { error: 'Gagal memproses peminjaman barang.' };
         toast.error(errorData.error || 'Gagal memproses peminjaman barang.', 'Tambah Peminjaman');
       }
     } catch (error) {

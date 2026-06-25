@@ -20,7 +20,12 @@ export function Dashboard() {
           fetch('/api/activities')
         ]);
         
-        if (summaryRes.ok && activitiesRes.ok) {
+        const isJson = (res: Response) => {
+          const contentType = res.headers.get('content-type');
+          return !!(contentType && contentType.includes('application/json'));
+        };
+
+        if (summaryRes.ok && activitiesRes.ok && isJson(summaryRes) && isJson(activitiesRes)) {
           setSummary(await summaryRes.json());
           setActivities(await activitiesRes.json());
         }

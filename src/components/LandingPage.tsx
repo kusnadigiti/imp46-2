@@ -26,9 +26,15 @@ export function LandingPage({ onAdminClick }: LandingPageProps) {
         fetch('/api/loans'),
         fetch('/api/repairs')
       ]);
-      if (itemsRes.ok) setItems(await itemsRes.json());
-      if (loansRes.ok) setLoans(await loansRes.json());
-      if (repairsRes.ok) setRepairs(await repairsRes.json());
+
+      const isJson = (res: Response) => {
+        const contentType = res.headers.get('content-type');
+        return !!(contentType && contentType.includes('application/json'));
+      };
+
+      if (itemsRes.ok && isJson(itemsRes)) setItems(await itemsRes.json());
+      if (loansRes.ok && isJson(loansRes)) setLoans(await loansRes.json());
+      if (repairsRes.ok && isJson(repairsRes)) setRepairs(await repairsRes.json());
     } catch (error) {
       console.error('Gagal mengambil data:', error);
     }

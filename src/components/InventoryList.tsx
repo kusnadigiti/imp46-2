@@ -37,7 +37,8 @@ export function InventoryList() {
   const fetchItems = async () => {
     try {
       const res = await fetch('/api/inventory');
-      if (res.ok) {
+      const contentType = res.headers.get('content-type');
+      if (res.ok && contentType && contentType.includes('application/json')) {
         setItems(await res.json());
       }
     } catch (error) {

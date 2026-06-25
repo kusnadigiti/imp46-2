@@ -26,8 +26,11 @@ export function UsersList() {
   const fetchUsers = async () => {
     try {
       const res = await fetch('/api/users');
-      const data = await res.json();
-      setUsers(data);
+      const contentType = res.headers.get('content-type');
+      if (res.ok && contentType && contentType.includes('application/json')) {
+        const data = await res.json();
+        setUsers(data);
+      }
     } catch (error) {
       console.error('Failed to fetch users', error);
     } finally {
