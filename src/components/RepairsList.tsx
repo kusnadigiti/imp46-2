@@ -171,7 +171,10 @@ export function RepairsList() {
         setIsModalOpen(false);
         fetchData();
       } else {
-        toast.error('Gagal mengirimkan laporan kerusakan.', 'Laporkan Kerusakan');
+        const contentType = res.headers.get('content-type');
+        const isJson = contentType && contentType.includes('application/json');
+        const errorData = isJson ? await res.json() : { error: 'Gagal mengirimkan laporan kerusakan.' };
+        toast.error(errorData.error || 'Gagal mengirimkan laporan kerusakan.', 'Laporkan Kerusakan');
       }
     } catch (error) {
       console.error("Failed to save repair:", error);
