@@ -64,10 +64,37 @@ export function Reports() {
           jsPDF:        { unit: 'mm', format: 'a4', orientation: activeReport === 'loans' ? 'landscape' : 'portrait' }
         };
 
-        const generator = (html2pdf as any).default || html2pdf;
-        await generator().set(opt).from(element).save();
+        let generator: any = null;
+        try {
+          if (html2pdf) {
+            generator = (html2pdf as any).default || html2pdf;
+          }
+        } catch (e) {
+          console.warn("Local html2pdf import is not available, trying CDN fallback...", e);
+        }
+
+        if (!generator || typeof generator !== 'function') {
+          if ((window as any).html2pdf) {
+            generator = (window as any).html2pdf;
+          } else {
+            generator = await new Promise((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+              script.onload = () => resolve((window as any).html2pdf);
+              script.onerror = (err) => reject(err);
+              document.head.appendChild(script);
+            });
+          }
+        }
+
+        if (generator && typeof generator === 'function') {
+          await generator().set(opt).from(element).save();
+        } else {
+          throw new Error("html2pdf library could not be loaded");
+        }
       } catch (error) {
         console.error("PDF generation failed:", error);
+        alert("Gagal mengunduh PDF. Silakan coba Cetak Laporan sebagai alternatif.");
       } finally {
         setIsGeneratingPDF(false);
       }

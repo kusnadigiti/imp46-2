@@ -67,7 +67,13 @@ if (process.env.DATABASE_URL) {
   postgresPool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 5000 // 5 seconds timeout to prevent hanging
+    connectionTimeoutMillis: 5000, // 5 seconds timeout to prevent hanging
+    query_timeout: 5000 // 5 seconds query timeout
+  });
+  
+  // Register error listener to prevent unhandled process crashes on idle client drops
+  postgresPool.on('error', (err) => {
+    console.error('Unexpected error on idle PostgreSQL client:', err);
   });
 } else {
   console.log("No DATABASE_URL found. Using in-memory fallback.");
