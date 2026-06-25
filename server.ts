@@ -372,6 +372,9 @@ async function startServer() {
         await addActivity('addition', id, name, `Menambahkan ${quantity} unit ke stok`);
         res.status(201).json(rows[0]);
       } catch (err: any) {
+        if (err.code === '23505') {
+          return res.status(400).json({ error: `Kode Barang "${req.body.kodeBarang}" sudah terdaftar dalam sistem. Silakan gunakan Kode Barang lainnya.` });
+        }
         res.status(500).json({ error: err.message });
       }
     } else {
@@ -411,6 +414,9 @@ async function startServer() {
 
         res.json(rows[0]);
       } catch (err: any) {
+        if (err.code === '23505') {
+          return res.status(400).json({ error: `Kode Barang "${req.body.kodeBarang}" sudah digunakan oleh barang lain. Silakan gunakan Kode Barang yang berbeda.` });
+        }
         res.status(500).json({ error: err.message });
       }
     } else {

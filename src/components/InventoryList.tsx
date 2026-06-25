@@ -143,7 +143,10 @@ export function InventoryList() {
         if (res.ok) {
           toast.success(`Data barang "${itemData.name}" berhasil diperbarui.`, 'Edit Inventaris');
         } else {
-          throw new Error('Gagal memperbarui barang');
+          const contentType = res.headers.get('content-type');
+          const isJson = contentType && contentType.includes('application/json');
+          const errorData = isJson ? await res.json() : {};
+          throw new Error(errorData.error || 'Gagal memperbarui barang');
         }
       } else {
         const res = await fetch('/api/inventory', {
@@ -154,15 +157,18 @@ export function InventoryList() {
         if (res.ok) {
           toast.success(`Barang "${itemData.name}" berhasil ditambahkan ke inventaris.`, 'Tambah Inventaris');
         } else {
-          throw new Error('Gagal menambahkan barang');
+          const contentType = res.headers.get('content-type');
+          const isJson = contentType && contentType.includes('application/json');
+          const errorData = isJson ? await res.json() : {};
+          throw new Error(errorData.error || 'Gagal menambahkan barang');
         }
       }
       setIsModalOpen(false);
       setEditingItem(null);
       fetchItems();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save item:", error);
-      toast.error(`Gagal menyimpan data barang "${itemData.name || ''}".`, 'Simpan Inventaris');
+      toast.error(error.message || `Gagal menyimpan data barang "${itemData.name || ''}".`, 'Simpan Inventaris');
     }
   };
 
