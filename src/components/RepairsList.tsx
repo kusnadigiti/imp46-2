@@ -5,8 +5,10 @@ import clsx from 'clsx';
 import { formatDistanceToNow, format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
 import Swal from 'sweetalert2';
+import { useToast } from './Toast';
 
 export function RepairsList() {
+  const toast = useToast();
   const [repairs, setRepairs] = useState<Repair[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,26 +44,38 @@ export function RepairsList() {
   };
 
   const handleUpdateStatus = async (id: string, currentStatus: string) => {
+    const repair = repairs.find(r => r.id === id);
+    const itemName = repair ? repair.itemName : 'Barang';
+    
     let nextStatus = 'Menunggu';
     if (currentStatus === 'Menunggu') nextStatus = 'Proses';
     else if (currentStatus === 'Proses') nextStatus = 'Selesai';
     
     try {
-      await fetch(`/api/repairs/${id}`, { 
+      const res = await fetch(`/api/repairs/${id}`, { 
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus })
       });
-      fetchData();
+      if (res.ok) {
+        toast.success(`Status perbaikan barang "${itemName}" diperbarui ke "${nextStatus}".`, 'Update Status Perbaikan');
+        fetchData();
+      } else {
+        toast.error('Gagal memperbarui status perbaikan.', 'Update Status Perbaikan');
+      }
     } catch (error) {
       console.error("Failed to update status:", error);
+      toast.error('Gagal menghubungi server untuk memperbarui status.', 'Update Status Perbaikan');
     }
   };
 
   const handleDelete = async (id: string) => {
+    const repair = repairs.find(r => r.id === id);
+    const itemName = repair ? repair.itemName : 'Barang';
+
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
-      text: "Data perbaikan ini akan dihapus permanen!",
+      text: `Data laporan perbaikan ${itemName} ini akan dihapus permanen!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -80,19 +94,20 @@ export function RepairsList() {
         return newSet;
       });
       fetchData();
-      Swal.fire('Terhapus!', 'Data perbaikan telah dihapus.', 'success');
+      toast.success(`Data laporan perbaikan "${itemName}" berhasil dihapus.`, 'Hapus Laporan Perbaikan');
     } catch (error) {
       console.error("Failed to delete repair:", error);
-      Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus data.', 'error');
+      toast.error(`Gagal menghapus laporan perbaikan untuk "${itemName}".`, 'Hapus Laporan Perbaikan');
     }
   };
 
   const handleDeleteSelected = async () => {
     if (selectedRepairs.size === 0) return;
+    const repairsCount = selectedRepairs.size;
     
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
-      text: `Anda akan menghapus ${selectedRepairs.size} data perbaikan terpilih!`,
+      text: `Anda akan menghapus ${repairsCount} data perbaikan terpilih!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -111,10 +126,10 @@ export function RepairsList() {
       );
       setSelectedRepairs(new Set());
       fetchData();
-      Swal.fire('Terhapus!', 'Data perbaikan terpilih telah dihapus.', 'success');
+      toast.success(`${repairsCount} data perbaikan terpilih berhasil dihapus.`, 'Hapus Massal');
     } catch (error) {
       console.error("Failed to delete selected repairs:", error);
-      Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus data terpilih.', 'error');
+      toast.error('Gagal menghapus beberapa data perbaikan terpilih.', 'Hapus Massal');
     }
   };
 
@@ -139,16 +154,24 @@ export function RepairsList() {
   };
 
   const handleSave = async (repairData: any) => {
+    const selectedItem = items.find(i => i.id === repairData.itemId);
+    const itemName = selectedItem ? selectedItem.name : 'Barang';
     try {
-      await fetch('/api/repairs', {
+      const res = await fetch('/api/repairs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(repairData)
       });
-      setIsModalOpen(false);
-      fetchData();
+      if (res.ok) {
+        toast.success(`Laporan kerusakan barang "${itemName}" berhasil didaftarkan.`, 'Laporkan Kerusakan');
+        setIsModalOpen(false);
+        fetchData();
+      } else {
+        toast.error('Gagal mengirimkan laporan kerusakan.', 'Laporkan Kerusakan');
+      }
     } catch (error) {
       console.error("Failed to save repair:", error);
+      toast.error('Gagal menghubungi server untuk mendaftarkan laporan kerusakan.', 'Laporkan Kerusakan');
     }
   };
 

@@ -5,8 +5,10 @@ import clsx from 'clsx';
 import { formatDistanceToNow, format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
 import Swal from 'sweetalert2';
+import { useToast } from './Toast';
 
 export function LoansList() {
+  const toast = useToast();
   const [loans, setLoans] = useState<Loan[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,15 +44,27 @@ export function LoansList() {
   };
 
   const handleReturn = async (id: string) => {
+    const loan = loans.find(l => l.id === id);
+    const itemName = loan ? loan.itemName : 'Barang';
     try {
-      await fetch(`/api/loans/${id}/return`, { method: 'PUT' });
-      fetchData();
+      const res = await fetch(`/api/loans/${id}/return`, { method: 'PUT' });
+      if (res.ok) {
+        toast.success(`Barang "${itemName}" berhasil dikembalikan.`, 'Pengembalian Barang');
+        fetchData();
+      } else {
+        const errorData = await res.json();
+        toast.error(errorData.error || 'Gagal memproses pengembalian.', 'Pengembalian Barang');
+      }
     } catch (error) {
       console.error("Failed to return item:", error);
+      toast.error('Gagal menghubungi server untuk memproses pengembalian.', 'Pengembalian Barang');
     }
   };
 
   const handleDelete = async (id: string) => {
+    const loan = loans.find(l => l.id === id);
+    const itemName = loan ? loan.itemName : 'Barang';
+
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
       text: "Data peminjaman ini akan dihapus dan stok akan dikembalikan jika masih dipinjam!",
@@ -72,19 +86,20 @@ export function LoansList() {
         return newSet;
       });
       fetchData();
-      Swal.fire('Terhapus!', 'Data peminjaman telah dihapus.', 'success');
+      toast.success(`Data peminjaman untuk "${itemName}" berhasil dihapus.`, 'Hapus Peminjaman');
     } catch (error) {
       console.error("Failed to delete loan:", error);
-      Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus data.', 'error');
+      toast.error(`Gagal menghapus data peminjaman untuk "${itemName}".`, 'Hapus Peminjaman');
     }
   };
 
   const handleDeleteSelected = async () => {
     if (selectedLoans.size === 0) return;
+    const loansCount = selectedLoans.size;
     
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
-      text: `Anda akan menghapus ${selectedLoans.size} data peminjaman terpilih!`,
+      text: `Anda akan menghapus ${loansCount} data peminjaman terpilih!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -103,10 +118,10 @@ export function LoansList() {
       );
       setSelectedLoans(new Set());
       fetchData();
-      Swal.fire('Terhapus!', 'Data peminjaman terpilih telah dihapus.', 'success');
+      toast.success(`${loansCount} data peminjaman terpilih berhasil dihapus.`, 'Hapus Massal');
     } catch (error) {
       console.error("Failed to delete selected loans:", error);
-      Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus data terpilih.', 'error');
+      toast.error('Gagal menghapus beberapa data peminjaman terpilih.', 'Hapus Massal');
     }
   };
 
@@ -131,16 +146,25 @@ export function LoansList() {
   };
 
   const handleSave = async (loanData: any) => {
+    const selectedItem = items.find(i => i.id === loanData.itemId);
+    const itemName = selectedItem ? selectedItem.name : 'Barang';
     try {
-      await fetch('/api/loans', {
+      const res = await fetch('/api/loans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loanData)
       });
-      setIsModalOpen(false);
-      fetchData();
+      if (res.ok) {
+        toast.success(`Berhasil meminjamkan "${itemName}" kepada ${loanData.borrowerName}.`, 'Tambah Peminjaman');
+        setIsModalOpen(false);
+        fetchData();
+      } else {
+        const errorData = await res.json();
+        toast.error(errorData.error || 'Gagal memproses peminjaman barang.', 'Tambah Peminjaman');
+      }
     } catch (error) {
       console.error("Failed to save loan:", error);
+      toast.error('Gagal menghubungi server untuk memproses peminjaman.', 'Tambah Peminjaman');
     }
   };
 

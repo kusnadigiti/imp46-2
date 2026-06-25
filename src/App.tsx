@@ -14,8 +14,9 @@ import { UsersList } from './components/UsersList';
 import { Login } from './components/Login';
 import { LandingPage } from './components/LandingPage';
 import { Monitor } from 'lucide-react';
+import { ToastProvider } from './components/Toast';
 
-export default function App() {
+function AppContent() {
   const [currentView, setCurrentView] = useState<'landing' | 'admin'>('landing');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'loans' | 'repairs' | 'reports' | 'users'>('dashboard');
@@ -153,6 +154,14 @@ export default function App() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
   );
 }
 

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Item } from '../types';
-import { Search, Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, X, Camera } from 'lucide-react';
 import clsx from 'clsx';
 import { formatDistanceToNow } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
 import Swal from 'sweetalert2';
+import { useToast } from './Toast';
+import { QRScanner } from './QRScanner';
 
 import { QRCodeSVG } from 'qrcode.react';
 
 export function InventoryList() {
+  const toast = useToast();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -19,6 +22,7 @@ export function InventoryList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,9 +48,12 @@ export function InventoryList() {
   };
 
   const handleDelete = async (id: string) => {
+    const itemToDelete = items.find(item => item.id === id);
+    const itemName = itemToDelete ? itemToDelete.name : 'Barang';
+
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
-      text: "Anda tidak akan dapat mengembalikan ini!",
+      text: `Anda tidak akan dapat mengembalikan data ${itemName}!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -65,19 +72,20 @@ export function InventoryList() {
         return newSet;
       });
       fetchItems();
-      Swal.fire('Terhapus!', 'Barang telah dihapus.', 'success');
+      toast.success(`Barang "${itemName}" berhasil dihapus dari inventaris.`, 'Hapus Inventaris');
     } catch (error) {
       console.error("Failed to delete item:", error);
-      Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus barang.', 'error');
+      toast.error(`Gagal menghapus data barang "${itemName}".`, 'Hapus Inventaris');
     }
   };
 
   const handleDeleteSelected = async () => {
     if (selectedItems.size === 0) return;
+    const itemsCount = selectedItems.size;
     
     const result = await Swal.fire({
       title: 'Apakah Anda yakin?',
-      text: `Anda akan menghapus ${selectedItems.size} barang terpilih!`,
+      text: `Anda akan menghapus ${itemsCount} barang terpilih!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -96,10 +104,10 @@ export function InventoryList() {
       );
       setSelectedItems(new Set());
       fetchItems();
-      Swal.fire('Terhapus!', 'Barang terpilih telah dihapus.', 'success');
+      toast.success(`${itemsCount} barang terpilih berhasil dihapus dari inventaris.`, 'Hapus Massal');
     } catch (error) {
       console.error("Failed to delete selected items:", error);
-      Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus barang terpilih.', 'error');
+      toast.error('Gagal menghapus beberapa barang terpilih.', 'Hapus Massal');
     }
   };
 
@@ -126,23 +134,34 @@ export function InventoryList() {
   const handleSave = async (itemData: Partial<Item>) => {
     try {
       if (editingItem) {
-        await fetch(`/api/inventory/${editingItem.id}`, {
+        const res = await fetch(`/api/inventory/${editingItem.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(itemData)
         });
+        if (res.ok) {
+          toast.success(`Data barang "${itemData.name}" berhasil diperbarui.`, 'Edit Inventaris');
+        } else {
+          throw new Error('Gagal memperbarui barang');
+        }
       } else {
-        await fetch('/api/inventory', {
+        const res = await fetch('/api/inventory', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(itemData)
         });
+        if (res.ok) {
+          toast.success(`Barang "${itemData.name}" berhasil ditambahkan ke inventaris.`, 'Tambah Inventaris');
+        } else {
+          throw new Error('Gagal menambahkan barang');
+        }
       }
       setIsModalOpen(false);
       setEditingItem(null);
       fetchItems();
     } catch (error) {
       console.error("Failed to save item:", error);
+      toast.error(`Gagal menyimpan data barang "${itemData.name || ''}".`, 'Simpan Inventaris');
     }
   };
 
@@ -154,6 +173,32 @@ export function InventoryList() {
   const openEditModal = (item: Item) => {
     setEditingItem(item);
     setIsModalOpen(true);
+  };
+
+  const handleScanSuccess = (decodedText: string) => {
+    const cleanCode = decodedText.trim();
+    setSearch(cleanCode);
+    setCategoryFilter(''); // reset category filter so scanned item displays correctly
+    
+    // Check if item exists in current list
+    const foundItem = items.find(item => 
+      item.kodeBarang.toLowerCase() === cleanCode.toLowerCase() || 
+      item.name.toLowerCase().includes(cleanCode.toLowerCase())
+    );
+
+    if (foundItem) {
+      toast.success(
+        `Barang "${foundItem.name}" (${foundItem.kodeBarang}) berhasil diidentifikasi!`,
+        'Scanner Sukses'
+      );
+    } else {
+      toast.info(
+        `Hasil pemindaian "${cleanCode}" dimasukkan ke filter pencarian.`,
+        'Pencarian Scanner'
+      );
+    }
+    
+    setIsScannerOpen(false);
   };
 
   const uniqueCategories: string[] = Array.from(new Set(items.map(item => item.category)));
@@ -195,6 +240,13 @@ export function InventoryList() {
               Hapus Terpilih ({selectedItems.size})
             </button>
           )}
+          <button 
+            onClick={() => setIsScannerOpen(true)}
+            className="rounded-md bg-slate-50 border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-100 transition-colors flex items-center gap-2"
+          >
+            <Camera className="w-4 h-4 text-slate-500" />
+            Scan QR / Barcode
+          </button>
           <button 
             onClick={openAddModal}
             className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
@@ -376,6 +428,14 @@ export function InventoryList() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Camera QR/Barcode Scanner Modal */}
+      {isScannerOpen && (
+        <QRScanner 
+          onScanSuccess={handleScanSuccess} 
+          onClose={() => setIsScannerOpen(false)} 
+        />
       )}
     </div>
   );

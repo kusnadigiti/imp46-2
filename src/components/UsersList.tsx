@@ -3,8 +3,10 @@ import { User } from '../types';
 import { Search, Plus, Edit2, Trash2, Shield, Mail, CheckCircle, XCircle } from 'lucide-react';
 import Swal from 'sweetalert2';
 import clsx from 'clsx';
+import { useToast } from './Toast';
 
 export function UsersList() {
+  const toast = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('Semua');
@@ -50,31 +52,30 @@ export function UsersList() {
     e.preventDefault();
     
     try {
-      const url = editingUser ? `/api/users/${editingUser.id}` : '/api/users';
-      const method = editingUser ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil',
-          text: editingUser ? 'Data pengguna diperbarui' : 'Pengguna baru ditambahkan',
-          timer: 1500,
-          showConfirmButton: false
-        });
-        setIsModalOpen(false);
-        fetchUsers();
-      }
+       const url = editingUser ? `/api/users/${editingUser.id}` : '/api/users';
+       const method = editingUser ? 'PUT' : 'POST';
+       
+       const response = await fetch(url, {
+         method,
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(formData),
+       });
+ 
+       if (response.ok) {
+         toast.success(
+           editingUser ? `Data pengguna "${formData.name}" diperbarui.` : `Pengguna "${formData.name}" berhasil ditambahkan.`,
+           editingUser ? 'Edit Pengguna' : 'Tambah Pengguna'
+         );
+         setIsModalOpen(false);
+         fetchUsers();
+       } else {
+         toast.error('Gagal menyimpan data pengguna.', 'Simpan Pengguna');
+       }
     } catch (error) {
-      Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+       toast.error('Terjadi kesalahan saat menyimpan data pengguna.', 'Simpan Pengguna');
     }
   };
-
+ 
   const handleDelete = async (id: string, name: string) => {
     const result = await Swal.fire({
       title: 'Hapus Pengguna?',
@@ -86,14 +87,18 @@ export function UsersList() {
       confirmButtonText: 'Ya, hapus!',
       cancelButtonText: 'Batal'
     });
-
+ 
     if (result.isConfirmed) {
       try {
-        await fetch(`/api/users/${id}`, { method: 'DELETE' });
-        fetchUsers();
-        Swal.fire('Terhapus!', 'Pengguna telah dihapus.', 'success');
+        const response = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+          fetchUsers();
+          toast.success(`Pengguna "${name}" berhasil dihapus.`, 'Hapus Pengguna');
+        } else {
+          toast.error(`Gagal menghapus pengguna "${name}".`, 'Hapus Pengguna');
+        }
       } catch (error) {
-        Swal.fire('Error', 'Gagal menghapus pengguna', 'error');
+        toast.error(`Gagal menghapus pengguna "${name}".`, 'Hapus Pengguna');
       }
     }
   };

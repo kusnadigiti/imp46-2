@@ -1,6 +1,6 @@
 {
   "name": "Inventory Manager Pro",
   "description": "A web-based inventory management application with real-time reporting, built with React and Express.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["camera"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
