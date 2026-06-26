@@ -96,50 +96,50 @@ export function QRScanner({ onScanSuccess, onClose }: QRScannerProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
-      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100 flex flex-col">
+    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-[9999]">
+      <div className="glass-panel rounded-xl shadow-2xl max-w-md w-full overflow-hidden border border-white/20 flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div className="px-6 py-4 glass-header flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Camera className="w-5 h-5 text-blue-600 animate-pulse" />
-            <h3 className="text-sm font-bold text-slate-800">Scan QR / Barcode Barang</h3>
+            <Camera className="w-5 h-5 text-pink-400 animate-pulse" />
+            <h3 className="text-sm font-bold text-white neon-text">Scan QR / Barcode Barang</h3>
           </div>
           <button 
             onClick={handleManualClose}
-            className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="p-1 rounded-lg text-white/50 hover:bg-white/10 hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scanner Screen */}
-        <div className="p-6 flex flex-col items-center justify-center bg-slate-950 min-h-[320px] relative">
+        <div className="p-6 flex flex-col items-center justify-center bg-black/60 min-h-[320px] relative">
           {error ? (
-            <div className="text-center text-slate-300 p-4 max-w-xs flex flex-col items-center gap-3">
+            <div className="text-center text-white/70 p-4 max-w-xs flex flex-col items-center gap-3">
               <AlertCircle className="w-12 h-12 text-rose-500" />
-              <p className="text-xs font-semibold text-slate-200">{error}</p>
+              <p className="text-xs font-semibold text-white/90">{error}</p>
               <button 
                 onClick={handleManualClose}
-                className="mt-2 text-xs font-bold text-white bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-500 transition-colors"
+                className="mt-2 text-xs font-bold text-white glass-button-primary px-4 py-2 rounded-md transition-colors"
               >
                 Tutup
               </button>
             </div>
           ) : (
             <div className="w-full relative flex flex-col items-center">
-              <div id={scannerId} className="w-full max-w-xs rounded-lg overflow-hidden bg-black aspect-square" />
+              <div id={scannerId} className="w-full max-w-xs rounded-lg overflow-hidden bg-black aspect-square shadow-[0_0_20px_rgba(236,72,153,0.3)]" />
               {/* Overlaid targeting lines inside scan area */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 pointer-events-none border-2 border-dashed border-blue-500 rounded-lg animate-pulse" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 pointer-events-none border-2 border-dashed border-pink-500 rounded-lg animate-pulse" />
             </div>
           )}
         </div>
 
         {/* Footer info */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex flex-col items-center justify-center text-center">
-          <p className="text-[11px] font-semibold text-slate-600">
-            Posisikan QR Code / Barcode di dalam kotak merah/biru.
+        <div className="px-6 py-4 glass-header flex flex-col items-center justify-center text-center">
+          <p className="text-[11px] font-semibold text-white/70">
+            Posisikan QR Code / Barcode di dalam kotak merah/pink.
           </p>
-          <p className="text-[10px] text-slate-400 mt-1 font-mono">
+          <p className="text-[10px] text-white/40 mt-1 font-mono">
             Sistem akan otomatis mendeteksi Kode Barang (contoh: BRG001)
           </p>
         </div>

@@ -28,7 +28,9 @@ export function Login({ onLogin }: LoginProps) {
           icon: 'success',
           title: 'Email Terkirim',
           text: `Instruksi untuk reset kata sandi telah dikirim ke ${resetEmail}`,
-          confirmButtonColor: '#2563eb'
+          confirmButtonColor: '#ec4899',
+          background: '#0f172a',
+          color: '#fff'
         });
         setIsResetMode(false);
         setResetEmail('');
@@ -48,33 +50,33 @@ export function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen aurora-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans text-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-md animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="flex justify-center">
-          <div className="bg-blue-600 p-4 rounded-2xl text-white shadow-lg">
+          <div className="bg-gradient-to-br from-pink-500 to-violet-600 p-4 rounded-2xl text-white shadow-[0_0_20px_rgba(236,72,153,0.5)]">
             <Monitor className="w-10 h-10" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-2xl font-bold tracking-tight text-slate-900">
+        <h2 className="mt-6 text-center text-2xl font-bold tracking-tight text-white neon-text">
           {isResetMode ? 'Reset Kata Sandi' : 'Masuk ke Sistem'}
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-500">
+        <p className="mt-2 text-center text-sm text-white/70">
           {isResetMode ? 'Masukkan email Anda untuk menerima instruksi reset' : 'Aplikasi Manajemen Inventaris Terintegrasi'}
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
-        <div className="bg-white py-8 px-4 shadow-sm sm:rounded-xl sm:px-10 border border-slate-200">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 relative z-10">
+        <div className="glass-panel py-8 px-4 shadow-2xl sm:rounded-xl sm:px-10 border border-white/20">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && !isResetMode && (
-              <div className="bg-red-50 text-red-600 text-xs p-3 rounded-md border border-red-100">
+              <div className="bg-red-500/20 text-red-300 text-xs p-3 rounded-md border border-red-500/30 font-semibold text-center">
                 {error}
               </div>
             )}
             
             {isResetMode ? (
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">
                   Alamat Email
                 </label>
                 <div className="mt-1">
@@ -83,7 +85,7 @@ export function Login({ onLogin }: LoginProps) {
                     required
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all font-sans text-slate-900"
+                    className="w-full px-3 py-2 text-sm rounded-md glass-input font-sans"
                     placeholder="Masukkan email Anda"
                   />
                 </div>
@@ -91,7 +93,7 @@ export function Login({ onLogin }: LoginProps) {
             ) : (
               <>
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">
                     Alamat Email
                   </label>
                   <div className="mt-1">
@@ -100,14 +102,14 @@ export function Login({ onLogin }: LoginProps) {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all font-sans text-slate-900"
+                      className="w-full px-3 py-2 text-sm rounded-md glass-input font-sans"
                       placeholder="admin@example.com"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">
                     Kata Sandi
                   </label>
                   <div className="mt-1">
@@ -116,7 +118,7 @@ export function Login({ onLogin }: LoginProps) {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all font-sans text-slate-900"
+                      className="w-full px-3 py-2 text-sm rounded-md glass-input font-sans"
                       placeholder="••••••••"
                     />
                   </div>
@@ -128,9 +130,9 @@ export function Login({ onLogin }: LoginProps) {
                       id="remember-me"
                       name="remember-me"
                       type="checkbox"
-                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      className="h-4 w-4 rounded border-white/30 bg-white/10 text-pink-500 focus:ring-pink-500/50"
                     />
-                    <label htmlFor="remember-me" className="ml-2 block text-xs text-slate-600">
+                    <label htmlFor="remember-me" className="ml-2 block text-xs text-white/70">
                       Ingat saya
                     </label>
                   </div>
@@ -139,7 +141,7 @@ export function Login({ onLogin }: LoginProps) {
                     <button 
                       type="button" 
                       onClick={() => setIsResetMode(true)}
-                      className="font-semibold text-blue-600 hover:text-blue-500"
+                      className="font-semibold text-pink-400 hover:text-pink-300"
                     >
                       Lupa kata sandi?
                     </button>
@@ -152,7 +154,7 @@ export function Login({ onLogin }: LoginProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors disabled:opacity-70"
+                className="flex w-full justify-center rounded-md glass-button-primary px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-500 disabled:opacity-70"
               >
                 {loading ? 'Memverifikasi...' : (isResetMode ? 'Kirim Link Reset' : 'Masuk')}
               </button>
@@ -162,7 +164,7 @@ export function Login({ onLogin }: LoginProps) {
                   type="button"
                   onClick={() => setIsResetMode(false)}
                   disabled={loading}
-                  className="flex w-full justify-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors disabled:opacity-70"
+                  className="flex w-full justify-center rounded-md glass-button px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/20 disabled:opacity-70"
                 >
                   Kembali ke Login
                 </button>

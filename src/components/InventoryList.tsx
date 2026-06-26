@@ -242,14 +242,14 @@ export function InventoryList() {
     <div className="p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Katalog Barang</h1>
-          <p className="text-slate-500 mt-2">Kelola informasi produk, kategori, dan jumlah stok.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white neon-text">Katalog Barang</h1>
+          <p className="text-white/70 mt-2">Kelola informasi produk, kategori, dan jumlah stok.</p>
         </div>
         <div className="flex gap-2">
           {selectedItems.size > 0 && (
             <button 
               onClick={handleDeleteSelected}
-              className="rounded-md bg-red-50 text-red-600 px-4 py-2 text-sm font-semibold shadow-sm hover:bg-red-100 transition-colors flex items-center gap-2"
+              className="rounded-md bg-red-500/20 border border-red-500/30 text-red-300 px-4 py-2 text-sm font-semibold shadow-sm hover:bg-red-500/30 transition-colors flex items-center gap-2"
             >
               <Trash2 className="w-4 h-4" />
               Hapus Terpilih ({selectedItems.size})
@@ -257,37 +257,37 @@ export function InventoryList() {
           )}
           <button 
             onClick={() => setIsScannerOpen(true)}
-            className="rounded-md bg-slate-50 border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-100 transition-colors flex items-center gap-2"
+            className="rounded-md glass-button px-4 py-2 text-sm font-semibold flex items-center gap-2"
           >
-            <Camera className="w-4 h-4 text-slate-500" />
+            <Camera className="w-4 h-4" />
             Scan QR / Barcode
           </button>
           <button 
             onClick={openAddModal}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+            className="rounded-md glass-button-primary px-4 py-2 text-sm font-semibold flex items-center gap-2"
           >
-            Tambah Barang
+            <Plus className="w-4 h-4" /> Tambah Barang
           </button>
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white flex flex-col h-[calc(100vh-220px)] overflow-hidden">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 p-5 bg-white gap-4">
+      <div className="rounded-xl glass-panel flex flex-col h-[calc(100vh-220px)] overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 p-5 glass-header gap-4">
           <div className="flex w-full sm:max-w-md gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/50" />
               <input 
                 type="text" 
                 placeholder="Cari nama, kode barang..." 
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-1.5 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                className="w-full pl-9 pr-4 py-1.5 text-sm rounded-md glass-input"
               />
             </div>
             <select
               value={categoryFilter}
               onChange={e => setCategoryFilter(e.target.value)}
-              className="px-3 py-1.5 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all bg-white"
+              className="px-3 py-1.5 text-sm rounded-md glass-input [&>option]:text-slate-900"
             >
               <option value="">Semua Kategori</option>
               {uniqueCategories.map(cat => (
@@ -295,12 +295,12 @@ export function InventoryList() {
               ))}
             </select>
           </div>
-          <button className="rounded-md bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 border border-slate-200 whitespace-nowrap">Ekspor CSV</button>
+          <button className="rounded-md glass-button px-3 py-1.5 text-xs font-semibold whitespace-nowrap">Ekspor CSV</button>
         </div>
 
         <div className="flex-1 overflow-auto">
           <table className="w-full text-left">
-            <thead className="bg-slate-50 text-[10px] font-bold uppercase text-slate-400 sticky top-0 z-10">
+            <thead className="bg-white/5 text-[10px] font-bold uppercase text-white/60 sticky top-0 z-10 backdrop-blur-md">
               <tr>
                 <th className="px-6 py-3 w-12">
                   <input 
@@ -310,7 +310,7 @@ export function InventoryList() {
                       if (input) input.indeterminate = isSomeSelected;
                     }}
                     onChange={handleSelectAll}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-white/30 bg-white/10 text-pink-500 focus:ring-pink-500/50"
                   />
                 </th>
                 <th className="px-6 py-3">Kode Barang</th>
@@ -321,51 +321,51 @@ export function InventoryList() {
                 <th className="px-6 py-3 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs font-mono">
+            <tbody className="divide-y divide-white/10 text-xs font-mono">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-slate-500 font-sans">Memuat inventaris...</td>
+                  <td colSpan={7} className="px-6 py-8 text-center text-white/50 font-sans">Memuat inventaris...</td>
                 </tr>
               ) : paginatedItems.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-slate-500 font-sans">
+                  <td colSpan={7} className="px-6 py-8 text-center text-white/50 font-sans">
                     Tidak ada barang yang cocok dengan pencarian Anda.
                   </td>
                 </tr>
               ) : (
                 paginatedItems.map((item) => (
-                  <tr key={item.id} className={clsx("hover:bg-slate-50 transition-colors", selectedItems.has(item.id) && "bg-blue-50/50")}>
+                  <tr key={item.id} className={clsx("hover:bg-white/5 transition-colors text-white/90", selectedItems.has(item.id) && "bg-white/10")}>
                     <td className="px-6 py-4">
                       <input 
                         type="checkbox" 
                         checked={selectedItems.has(item.id)}
                         onChange={(e) => handleSelectItem(item.id, e.target.checked)}
-                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-white/30 bg-white/10 text-pink-500 focus:ring-pink-500/50"
                       />
                     </td>
-                    <td className={clsx("px-6 py-4", item.quantity === 0 && "text-red-500")}>
+                    <td className={clsx("px-6 py-4", item.quantity === 0 && "text-red-400")}>
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">{item.kodeBarang}</span>
                         <button 
                           onClick={() => setQrCodeData(item.kodeBarang)}
-                          className="text-slate-400 hover:text-blue-600 transition-colors"
+                          className="text-white/40 hover:text-pink-400 transition-colors"
                           title="Lihat QR Code"
                         >
                           <QRCodeSVG value={item.kodeBarang} size={16} />
                         </button>
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-sans font-medium text-slate-900 italic">
+                    <td className="px-6 py-4 font-sans font-medium text-white italic">
                       {item.name}
                     </td>
-                    <td className="px-6 py-4 font-sans text-slate-600">{item.category}</td>
-                    <td className="px-6 py-4 font-sans text-slate-900">{item.location || '-'}</td>
+                    <td className="px-6 py-4 font-sans text-white/70">{item.category}</td>
+                    <td className="px-6 py-4 font-sans text-white/90">{item.location || '-'}</td>
                     <td className="px-6 py-4 text-center">
                       <span className={clsx(
-                        "rounded-full px-2 py-0.5",
-                        item.quantity > 15 && "bg-blue-100 text-blue-700",
-                        item.quantity > 0 && item.quantity <= 15 && "bg-orange-100 text-orange-700",
-                        item.quantity === 0 && "bg-red-100 text-red-700"
+                        "rounded-full px-2 py-0.5 font-semibold",
+                        item.quantity > 15 && "bg-blue-500/20 text-blue-300 border border-blue-500/30",
+                        item.quantity > 0 && item.quantity <= 15 && "bg-orange-500/20 text-orange-300 border border-orange-500/30",
+                        item.quantity === 0 && "bg-red-500/20 text-red-300 border border-red-500/30"
                       )}>
                         {item.quantity}
                       </span>
@@ -373,14 +373,14 @@ export function InventoryList() {
                     <td className="px-6 py-4 text-right space-x-2 font-sans">
                       <button 
                         onClick={() => openEditModal(item)}
-                        className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
+                        className="p-1 text-white/40 hover:text-blue-400 transition-colors"
                         title="Edit Item"
                       >
                         <Edit2 className="w-4 h-4 inline" />
                       </button>
                       <button 
                         onClick={() => handleDelete(item.id)}
-                        className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                        className="p-1 text-white/40 hover:text-red-400 transition-colors"
                         title="Delete Item"
                       >
                         <Trash2 className="w-4 h-4 inline" />
@@ -394,22 +394,22 @@ export function InventoryList() {
         </div>
 
         {/* Pagination Controls */}
-        <div className="border-t border-slate-200 px-6 py-4 flex items-center justify-between bg-slate-50">
-          <span className="text-sm text-slate-500">
-            Halaman <span className="font-medium text-slate-900">{currentPage}</span> dari <span className="font-medium text-slate-900">{totalPages}</span>
+        <div className="border-t border-white/10 px-6 py-4 flex items-center justify-between glass-header">
+          <span className="text-sm text-white/60">
+            Halaman <span className="font-medium text-white">{currentPage}</span> dari <span className="font-medium text-white">{totalPages}</span>
           </span>
           <div className="flex gap-2">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1 text-sm font-medium glass-button rounded disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Sebelumnya
             </button>
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1 text-sm font-medium glass-button rounded disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Selanjutnya
             </button>
@@ -485,47 +485,47 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
-        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-          <h2 className="text-sm font-bold uppercase tracking-tight text-slate-900">
+    <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="glass-panel rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="px-6 py-4 glass-header flex justify-between items-center">
+          <h2 className="text-sm font-bold uppercase tracking-tight text-white neon-text">
             {item ? 'Edit Barang' : 'Tambah Barang Baru'}
           </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+          <button onClick={onClose} className="text-white/50 hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Nama Produk</label>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Nama Produk</label>
             <input 
               required
               type="text" 
               value={formData.name}
               onChange={e => setFormData({...formData, name: e.target.value})}
-              className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all font-sans italic text-slate-900"
+              className="w-full px-3 py-2 text-sm rounded-md glass-input font-sans italic"
               placeholder="Contoh: Wireless Mouse"
             />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Kode Barang</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Kode Barang</label>
               <div className="flex gap-2">
                 <input 
                   required
                   type="text" 
                   value={formData.kodeBarang}
                   onChange={e => setFormData({...formData, kodeBarang: e.target.value})}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono transition-all text-slate-900 bg-slate-50"
+                  className="w-full px-3 py-2 text-sm rounded-md glass-input font-mono bg-white/5"
                   readOnly
                 />
                 {!item && (
                   <button 
                     type="button"
                     onClick={generateNewCode}
-                    className="px-3 rounded-md bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold hover:bg-slate-200 transition-colors"
+                    className="px-3 rounded-md glass-button text-xs font-semibold"
                   >
                     Generate
                   </button>
@@ -534,7 +534,7 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
             </div>
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400">Kategori</label>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/50">Kategori</label>
                 {categories.length > 0 && (
                   <button 
                     type="button" 
@@ -542,7 +542,7 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
                       setIsNewCategory(!isNewCategory);
                       setFormData({...formData, category: ''});
                     }} 
-                    className="text-[10px] text-blue-600 font-medium hover:underline"
+                    className="text-[10px] text-pink-400 font-medium hover:underline"
                   >
                     {isNewCategory ? 'Pilih Kategori' : 'Kategori Baru'}
                   </button>
@@ -554,7 +554,7 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
                   type="text" 
                   value={formData.category}
                   onChange={e => setFormData({...formData, category: e.target.value})}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-slate-900 font-sans"
+                  className="w-full px-3 py-2 text-sm rounded-md glass-input font-sans"
                   placeholder="Kategori Baru..."
                 />
               ) : (
@@ -562,7 +562,7 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
                   required
                   value={formData.category}
                   onChange={e => setFormData({...formData, category: e.target.value})}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-slate-900 font-sans bg-white"
+                  className="w-full px-3 py-2 text-sm rounded-md glass-input font-sans [&>option]:text-slate-900"
                 >
                   <option value="" disabled>Pilih Kategori</option>
                   {categories.map(cat => (
@@ -575,25 +575,25 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Posisi Barang</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Posisi Barang</label>
               <input 
                 required
                 type="text" 
                 value={formData.location}
                 onChange={e => setFormData({...formData, location: e.target.value})}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all font-sans text-slate-900"
+                className="w-full px-3 py-2 text-sm rounded-md glass-input font-sans"
                 placeholder="Rak A1"
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Jumlah</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Jumlah</label>
               <input 
                 required
                 type="number" 
                 min="0"
                 value={formData.quantity}
                 onChange={e => setFormData({...formData, quantity: e.target.value})}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all font-mono text-slate-900"
+                className="w-full px-3 py-2 text-sm rounded-md glass-input font-mono"
               />
             </div>
           </div>
@@ -602,13 +602,13 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
             <button 
               type="button" 
               onClick={onClose}
-              className="rounded-md bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 border border-slate-200 hover:bg-slate-100 transition-colors"
+              className="rounded-md glass-button px-3 py-1.5 text-xs font-semibold"
             >
               Batal
             </button>
             <button 
               type="submit"
-              className="rounded-md bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+              className="rounded-md glass-button-primary px-4 py-1.5 text-xs font-semibold"
             >
               {item ? 'Simpan' : 'Tambah Barang'}
             </button>

@@ -59,52 +59,52 @@ function AppContent() {
   }
 
   return (
-    <div className="flex h-screen w-full flex-col bg-slate-50 font-sans text-slate-900 overflow-hidden print:h-auto print:bg-white">
+    <div className="flex h-screen w-full flex-col aurora-bg font-sans text-white overflow-hidden print:h-auto print:bg-white">
       {/* Top Navigation Bar */}
-      <header className="flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white px-8 z-10 print:hidden">
+      <header className="flex h-16 w-full shrink-0 items-center justify-between glass-header px-8 z-10 print:hidden">
         <div className="flex items-center gap-3">
-          <div className="bg-blue-600 p-2 rounded-lg text-white">
+          <div className="bg-gradient-to-br from-pink-500 to-violet-600 p-2 rounded-lg text-white shadow-[0_0_10px_rgba(236,72,153,0.5)]">
             <Monitor className="w-5 h-5" />
           </div>
-          <h1 className="text-lg font-bold tracking-tight text-slate-900 uppercase">SMKN 46 JAKARTA <span className="text-xs font-normal text-slate-400 ml-2">Manajemen Inventaris</span></h1>
+          <h1 className="text-lg font-bold tracking-tight text-white uppercase neon-text">SMKN 46 JAKARTA <span className="text-xs font-normal text-white/60 ml-2">Manajemen Inventaris</span></h1>
         </div>
-        <nav className="flex gap-8 text-sm font-medium text-slate-500">
+        <nav className="flex gap-8 text-sm font-medium text-white/60">
           <button 
             onClick={() => setActiveTab('dashboard')} 
-            className={activeTab === 'dashboard' ? "text-blue-600" : "hover:text-slate-900"}
+            className={activeTab === 'dashboard' ? "text-pink-400 neon-text" : "hover:text-white transition-colors"}
           >
             Dasbor
           </button>
           <button 
             onClick={() => setActiveTab('inventory')} 
-            className={activeTab === 'inventory' ? "text-blue-600" : "hover:text-slate-900"}
+            className={activeTab === 'inventory' ? "text-pink-400 neon-text" : "hover:text-white transition-colors"}
           >
             Inventaris
           </button>
           <button 
             onClick={() => setActiveTab('loans')} 
-            className={activeTab === 'loans' ? "text-blue-600" : "hover:text-slate-900"}
+            className={activeTab === 'loans' ? "text-pink-400 neon-text" : "hover:text-white transition-colors"}
           >
             Peminjaman
           </button>
           <button 
             onClick={() => setActiveTab('repairs')} 
-            className={activeTab === 'repairs' ? "text-blue-600" : "hover:text-slate-900"}
+            className={activeTab === 'repairs' ? "text-pink-400 neon-text" : "hover:text-white transition-colors"}
           >
             Perbaikan
           </button>
           <button 
             onClick={() => setActiveTab('reports')} 
-            className={activeTab === 'reports' ? "text-blue-600" : "hover:text-slate-900"}
+            className={activeTab === 'reports' ? "text-pink-400 neon-text" : "hover:text-white transition-colors"}
           >
             Laporan
           </button>
         </nav>
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-end">
-            <span className="text-xs font-semibold">Admin Sistem</span>
-            <span className="text-[10px] text-green-500 flex items-center gap-1">
-              <span className="h-1 w-1 rounded-full bg-green-500"></span> Backend Aktif
+            <span className="text-xs font-semibold text-white/90">Admin Sistem</span>
+            <span className="text-[10px] text-green-400 flex items-center gap-1">
+              <span className="h-1 w-1 rounded-full bg-green-400 shadow-[0_0_5px_rgba(74,222,128,0.8)]"></span> Backend Aktif
             </span>
           </div>
           <button
@@ -112,7 +112,7 @@ function AppContent() {
               setIsAuthenticated(false);
               setCurrentView('landing');
             }}
-            className="flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-slate-200 bg-white text-xs font-semibold text-red-600 hover:bg-red-50 hover:border-red-100 transition-colors"
+            className="flex items-center justify-center gap-2 h-9 px-4 rounded-md glass-button text-xs font-semibold text-pink-400 hover:text-pink-300 transition-colors"
           >
             Logout
           </button>
@@ -132,26 +132,26 @@ function AppContent() {
       </div>
 
       {/* Status Footer Bar */}
-      <footer className="h-8 w-full shrink-0 bg-white border-t border-slate-200 flex items-center px-8 justify-between text-[10px] text-slate-400 uppercase tracking-widest font-bold z-10 print:hidden">
+      <footer className="h-8 w-full shrink-0 glass-header flex items-center px-8 justify-between text-[10px] text-white/50 uppercase tracking-widest font-bold z-10 print:hidden">
         <div className="flex gap-6 items-center">
-          <span>Sesi: <span className="text-slate-600 font-bold">Aktif</span></span>
+          <span>Sesi: <span className="text-white/80 font-bold">Aktif</span></span>
           <span className="flex items-center gap-1.5">
             Database: {dbStatus?.connected ? (
-              <span className="text-emerald-600 font-bold flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-green-400 font-bold flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-400 shadow-[0_0_5px_rgba(74,222,128,0.8)] animate-pulse"></span>
                 NEON POSTGRESQL TERHUBUNG
               </span>
             ) : (
-              <span className="text-amber-600 font-bold flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+              <span className="text-amber-400 font-bold flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.8)]"></span>
                 LOCAL FALLBACK (MEMORI)
               </span>
             )}
           </span>
         </div>
         <div className="flex items-center gap-4">
-          {dbStatus?.type && <span className="text-slate-500 lowercase normal-case font-normal italic">({dbStatus.type})</span>}
-          <span>Status Server: <span className="text-blue-600 font-bold">Online</span></span>
+          {dbStatus?.type && <span className="text-white/40 lowercase normal-case font-normal italic">({dbStatus.type})</span>}
+          <span>Status Server: <span className="text-pink-400 font-bold">Online</span></span>
         </div>
       </footer>
     </div>
