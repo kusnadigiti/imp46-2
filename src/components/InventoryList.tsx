@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import Papa from 'papaparse';
 import { Item } from '../types';
-import { Search, Plus, Edit2, Trash2, X, Camera } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, X, Camera, Upload, Download } from 'lucide-react';
 import clsx from 'clsx';
 import { formatDistanceToNow } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
@@ -228,6 +229,100 @@ export function InventoryList() {
     setIsScannerOpen(false);
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const data = results.data as any[];
+        let successCount = 0;
+        let errorCount = 0;
+
+        // Show loading toast
+        toast.info(`Memproses ${data.length} data...`, 'Import Data');
+
+        for (const row of data) {
+          try {
+            // Mapping CSV/Excel header to Item model
+            const itemData: Partial<Item> = {
+              name: row.NamaBarang || row.name || row['Nama Barang'] || '',
+              kodeBarang: row.KodeBarang || row.kodeBarang || row['Kode Barang'] || '',
+              category: row.Kategori || row.category || row.Category || '',
+              location: row.Lokasi || row.location || row.Location || '',
+              quantity: parseInt(row.Jumlah || row.quantity || row.Quantity || '0', 10),
+              price: parseFloat(row.Harga || row.price || row.Price || '0') || null
+            };
+
+            if (!itemData.name || !itemData.kodeBarang) {
+              errorCount++;
+              continue;
+            }
+
+            const res = await fetch('/api/inventory', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(itemData)
+            });
+
+            if (res.ok) {
+              successCount++;
+            } else {
+              errorCount++;
+            }
+          } catch (err) {
+            errorCount++;
+          }
+        }
+
+        fetchItems();
+        
+        if (successCount > 0) {
+          toast.success(`Berhasil mengimpor ${successCount} barang.`, 'Import Selesai');
+        }
+        if (errorCount > 0) {
+          toast.error(`Gagal mengimpor ${errorCount} baris data (format tidak valid atau duplikat).`, 'Import Peringatan');
+        }
+        
+        // Reset file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      },
+      error: (error) => {
+        toast.error(`Gagal membaca file CSV: ${error.message}`, 'Error Import');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    });
+  };
+
+  const handleDownloadTemplate = () => {
+    const templateData = [
+      {
+        'Kode Barang': 'KB-CONTOH',
+        'Nama Barang': 'Laptop Lenovo Thinkpad',
+        'Kategori': 'Elektronik',
+        'Lokasi': 'Lab Komputer 1',
+        'Jumlah': 15,
+        'Harga': 15000000
+      }
+    ];
+    const csv = Papa.unparse(templateData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', 'template_import_barang.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const uniqueCategories: string[] = Array.from(new Set(items.map(item => item.category)));
 
   const filteredItems = items.filter(item => {
@@ -267,12 +362,26 @@ export function InventoryList() {
               Hapus Terpilih ({selectedItems.size})
             </button>
           )}
+          <input 
+            type="file" 
+            accept=".csv" 
+            ref={fileInputRef} 
+            onChange={handleImport} 
+            className="hidden" 
+          />
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-md glass-button px-4 py-2 text-sm font-semibold flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" />
+            Import CSV
+          </button>
           <button 
             onClick={() => setIsScannerOpen(true)}
             className="rounded-md glass-button px-4 py-2 text-sm font-semibold flex items-center gap-2"
           >
             <Camera className="w-4 h-4" />
-            Scan QR / Barcode
+            Scan QR
           </button>
           <button 
             onClick={openAddModal}
@@ -307,7 +416,13 @@ export function InventoryList() {
               ))}
             </select>
           </div>
-          <button className="rounded-md glass-button px-3 py-1.5 text-xs font-semibold whitespace-nowrap">Ekspor CSV</button>
+          <div className="flex gap-2">
+            <button onClick={handleDownloadTemplate} className="rounded-md glass-button px-3 py-1.5 text-xs font-semibold flex items-center gap-1 whitespace-nowrap">
+              <Download className="w-3.5 h-3.5" />
+              Template CSV
+            </button>
+            <button className="rounded-md glass-button px-3 py-1.5 text-xs font-semibold whitespace-nowrap">Ekspor CSV</button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-auto">
