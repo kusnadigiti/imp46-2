@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import pg from 'pg';
 import dotenv from 'dotenv';
 
@@ -66,7 +65,9 @@ if (process.env.DATABASE_URL) {
   console.log("DATABASE_URL found! Connecting to Neon PostgreSQL...");
   postgresPool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 5000,
+    query_timeout: 5000
   });
   
   // Register error listener to prevent unhandled process crashes on idle client drops
@@ -239,6 +240,14 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Vercel pre-parses the body for Serverless functions.
+  // We need to skip express.json() if the body is already an object.
+  app.use((req: any, res: any, next: any) => {
+    if (req.body && typeof req.body === 'object') {
+      req._body = true; // Tell body-parser it's already parsed
+    }
+    next();
+  });
   app.use(express.json());
 
   // Bootstrap the database before handling requests
@@ -793,6 +802,7 @@ async function startServer() {
 
   // --- Vite Middleware for Development ---
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",

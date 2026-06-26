@@ -145,6 +145,10 @@ export function InventoryList() {
         } else {
           const contentType = res.headers.get('content-type');
           const isJson = contentType && contentType.includes('application/json');
+          if (!isJson) {
+            const errText = await res.text();
+            console.error("Non-JSON error response from server:", errText);
+          }
           const errorData = isJson ? await res.json() : {};
           throw new Error(errorData.error || 'Gagal memperbarui barang');
         }
@@ -159,6 +163,10 @@ export function InventoryList() {
         } else {
           const contentType = res.headers.get('content-type');
           const isJson = contentType && contentType.includes('application/json');
+          if (!isJson) {
+            const errText = await res.text();
+            console.error("Non-JSON error response from server:", errText);
+          }
           const errorData = isJson ? await res.json() : {};
           throw new Error(errorData.error || 'Gagal menambahkan barang');
         }
