@@ -66,9 +66,7 @@ if (process.env.DATABASE_URL) {
   console.log("DATABASE_URL found! Connecting to Neon PostgreSQL...");
   postgresPool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 5000, // 5 seconds timeout to prevent hanging
-    query_timeout: 5000 // 5 seconds query timeout
+    ssl: { rejectUnauthorized: false }
   });
   
   // Register error listener to prevent unhandled process crashes on idle client drops
@@ -243,10 +241,12 @@ async function startServer() {
 
   app.use(express.json());
 
-  // Bootstrap the database asynchronously if connected (non-blocking startup)
-  bootstrapDatabase().catch(err => {
-    console.error("Async database bootstrap failed:", err);
-  });
+  // Bootstrap the database before handling requests
+  try {
+    await bootstrapDatabase();
+  } catch(err) {
+    console.error("Database bootstrap failed:", err);
+  }
 
   // --- API Routes (Database Status Check) ---
   app.get('/api/db-status', async (req, res) => {
