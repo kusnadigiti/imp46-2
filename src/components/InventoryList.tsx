@@ -145,12 +145,18 @@ export function InventoryList() {
         } else {
           const contentType = res.headers.get('content-type');
           const isJson = contentType && contentType.includes('application/json');
+          let errorMessage = 'Gagal memperbarui barang';
           if (!isJson) {
             const errText = await res.text();
             console.error("Non-JSON error response from server:", errText);
+            if (res.status === 504 || res.status === 502) {
+              errorMessage = 'Server timeout atau sedang offline (Cold Start). Silakan coba lagi dalam beberapa detik.';
+            }
+          } else {
+            const errorData = await res.json();
+            errorMessage = errorData.error || errorMessage;
           }
-          const errorData = isJson ? await res.json() : {};
-          throw new Error(errorData.error || 'Gagal memperbarui barang');
+          throw new Error(errorMessage);
         }
       } else {
         const res = await fetch('/api/inventory', {
@@ -163,12 +169,18 @@ export function InventoryList() {
         } else {
           const contentType = res.headers.get('content-type');
           const isJson = contentType && contentType.includes('application/json');
+          let errorMessage = 'Gagal menambahkan barang';
           if (!isJson) {
             const errText = await res.text();
             console.error("Non-JSON error response from server:", errText);
+            if (res.status === 504 || res.status === 502) {
+              errorMessage = 'Server timeout atau sedang offline (Cold Start). Silakan coba lagi dalam beberapa detik.';
+            }
+          } else {
+            const errorData = await res.json();
+            errorMessage = errorData.error || errorMessage;
           }
-          const errorData = isJson ? await res.json() : {};
-          throw new Error(errorData.error || 'Gagal menambahkan barang');
+          throw new Error(errorMessage);
         }
       }
       setIsModalOpen(false);

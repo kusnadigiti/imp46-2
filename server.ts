@@ -241,21 +241,34 @@ async function startServer() {
   const PORT = 3000;
 
   // Vercel pre-parses the body for Serverless functions.
-  // We need to skip express.json() if the body is already an object.
+  // We need to skip express.json() if the body is already present to prevent hanging.
   app.use((req: any, res: any, next: any) => {
-    if (req.body && typeof req.body === 'object') {
-      req._body = true; // Tell body-parser it's already parsed
+    // Vercel strips the /api prefix sometimes when routing to /api/index.ts
+    // We only apply this on Vercel to avoid breaking local Vite development.
+    if (process.env.VERCEL && req.url && !req.url.startsWith('/api') && req.url !== '/' && !req.url.startsWith('/assets')) {
+      req.url = '/api' + (req.url.startsWith('/') ? '' : '/') + req.url;
+    }
+    
+    if (req.body !== undefined) {
+      req._body = true; // Tell body-parser the body is already read
+      if (typeof req.body === 'string') {
+        try {
+          req.body = JSON.parse(req.body);
+        } catch(e) {}
+      } else if (Buffer.isBuffer(req.body)) {
+        try {
+          req.body = JSON.parse(req.body.toString());
+        } catch(e) {}
+      }
     }
     next();
   });
   app.use(express.json());
 
-  // Bootstrap the database before handling requests
-  try {
-    await bootstrapDatabase();
-  } catch(err) {
+  // Bootstrap the database asynchronously to avoid blocking the serverless function cold start
+  bootstrapDatabase().catch(err => {
     console.error("Database bootstrap failed:", err);
-  }
+  });
 
   // --- API Routes (Database Status Check) ---
   app.get('/api/db-status', async (req, res) => {
