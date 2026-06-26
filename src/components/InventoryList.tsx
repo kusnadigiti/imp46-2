@@ -323,13 +323,17 @@ export function InventoryList() {
     document.body.removeChild(link);
   };
 
-  const uniqueCategories: string[] = Array.from(new Set(items.map(item => item.category)));
+  const uniqueCategories: string[] = Array.from(new Set(items.map(item => item.category || '')));
 
   const filteredItems = items.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || 
-                          item.kodeBarang.toLowerCase().includes(search.toLowerCase()) ||
-                          item.category.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = categoryFilter === '' || item.category === categoryFilter;
+    const safeName = item.name || '';
+    const safeKode = item.kodeBarang || '';
+    const safeCat = item.category || '';
+    
+    const matchesSearch = safeName.toLowerCase().includes(search.toLowerCase()) || 
+                          safeKode.toLowerCase().includes(search.toLowerCase()) ||
+                          safeCat.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = categoryFilter === '' || safeCat === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
@@ -723,6 +727,19 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
                 className="w-full px-3 py-2 text-sm rounded-md glass-input font-mono"
               />
             </div>
+          </div>
+          
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Harga (Rp)</label>
+            <input 
+              required
+              type="number" 
+              min="0"
+              value={formData.price}
+              onChange={e => setFormData({...formData, price: e.target.value})}
+              className="w-full px-3 py-2 text-sm rounded-md glass-input font-mono"
+              placeholder="0"
+            />
           </div>
 
           <div className="pt-6 flex justify-end gap-3">
