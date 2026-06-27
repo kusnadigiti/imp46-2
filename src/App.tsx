@@ -141,10 +141,15 @@ function AppContent() {
                 <span className="h-1.5 w-1.5 rounded-full bg-green-400 shadow-[0_0_5px_rgba(74,222,128,0.8)] animate-pulse"></span>
                 NEON POSTGRESQL TERHUBUNG
               </span>
-            ) : (
+            ) : dbStatus?.isFallback ? (
               <span className="text-amber-400 font-bold flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.8)]"></span>
                 LOCAL FALLBACK (MEMORI)
+              </span>
+            ) : (
+              <span className="text-red-500 font-bold flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)] animate-pulse"></span>
+                DATABASE ERROR
               </span>
             )}
           </span>

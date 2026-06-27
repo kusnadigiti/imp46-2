@@ -279,7 +279,7 @@ async function startServer() {
         client.release();
         res.json({ connected: true, isFallback: false, type: 'Neon PostgreSQL' });
       } catch (err: any) {
-        res.json({ connected: false, isFallback: true, type: `In-Memory Fallback (Koneksi Gagal: ${err.message})` });
+        res.json({ connected: false, isFallback: false, type: `Koneksi Database Gagal: ${err.message}` });
       }
     } else {
       res.json({ connected: false, isFallback: true, type: 'In-Memory Fallback (DATABASE_URL Belum Dikonfigurasi)' });

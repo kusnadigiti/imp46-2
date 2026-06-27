@@ -273,9 +273,14 @@ export function InventoryList() {
               successCount++;
             } else {
               errorCount++;
+              const errData = await res.json().catch(() => ({}));
+              if (errData.error) {
+                toast.error(`Gagal baris data: ${errData.error}`);
+              }
             }
-          } catch (err) {
+          } catch (err: any) {
             errorCount++;
+            toast.error(`Error baris data: ${err.message || 'Gagal menyimpan ke server'}`);
           }
         }
 
@@ -285,7 +290,7 @@ export function InventoryList() {
           toast.success(`Berhasil mengimpor ${successCount} barang.`, 'Import Selesai');
         }
         if (errorCount > 0) {
-          toast.error(`Gagal mengimpor ${errorCount} baris data (format tidak valid atau duplikat).`, 'Import Peringatan');
+          toast.error(`Terdapat ${errorCount} baris data yang gagal diimpor. Pastikan format benar dan server/database terhubung.`, 'Import Peringatan');
         }
         
         // Reset file input
