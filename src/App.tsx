@@ -14,13 +14,16 @@ import { UsersList } from './components/UsersList';
 import { Login } from './components/Login';
 import { LandingPage } from './components/LandingPage';
 import { Monitor } from 'lucide-react';
-import { ToastProvider } from './components/Toast';
+import { ToastProvider, useToast } from './components/Toast';
 
 function AppContent() {
   const [currentView, setCurrentView] = useState<'landing' | 'admin'>('landing');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'loans' | 'repairs' | 'reports' | 'users'>('dashboard');
   const [dbStatus, setDbStatus] = useState<{ connected: boolean; isFallback: boolean; type: string } | null>(null);
+  
+  const toast = useToast();
+  const lastStatusRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
     const fetchDbStatus = async () => {
@@ -30,6 +33,12 @@ function AppContent() {
         if (res.ok && contentType && contentType.includes('application/json')) {
           const data = await res.json();
           setDbStatus(data);
+          
+          const currentStatus = data.connected ? 'connected' : (data.isFallback ? 'fallback' : 'error');
+          if (currentStatus === 'error' && lastStatusRef.current !== 'error') {
+            toast.error(data.type || "Koneksi ke database Neon PostgreSQL gagal.", "Database Error");
+          }
+          lastStatusRef.current = currentStatus;
         }
       } catch (err) {
         console.error("Failed to fetch database status:", err);
@@ -147,7 +156,13 @@ function AppContent() {
                 LOCAL FALLBACK (MEMORI)
               </span>
             ) : (
-              <span className="text-red-500 font-bold flex items-center gap-1">
+              <span 
+                className="text-red-500 font-bold flex items-center gap-1 cursor-pointer hover:text-red-400 active:scale-95 transition-all"
+                title="Klik untuk melihat detail error"
+                onClick={() => {
+                  alert(dbStatus?.type || "Koneksi ke database Neon PostgreSQL gagal.");
+                }}
+              >
                 <span className="h-1.5 w-1.5 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)] animate-pulse"></span>
                 DATABASE ERROR
               </span>
