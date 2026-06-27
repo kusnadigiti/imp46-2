@@ -254,8 +254,8 @@ export function InventoryList() {
               kodeBarang: row.KodeBarang || row.kodeBarang || row['Kode Barang'] || '',
               category: row.Kategori || row.category || row.Category || '',
               location: row.Lokasi || row.location || row.Location || '',
-              quantity: parseInt(row.Jumlah || row.quantity || row.Quantity || '0', 10),
-              price: parseFloat(row.Harga || row.price || row.Price || '0') || null
+              quantity: parseInt(row.Jumlah || row.quantity || row.Quantity || '0', 10) || 0,
+              price: parseFloat(row.Harga || row.price || row.Price || '0') || 0
             };
 
             if (!itemData.name || !itemData.kodeBarang) {
@@ -591,13 +591,13 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
   const [formData, setFormData] = useState({
     name: item?.name || '',
     kodeBarang: item?.kodeBarang || `KB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-    category: item?.category || '',
+    category: item?.category || (categories.length > 0 ? categories[0] : ''),
     location: item?.location || '',
-    price: item?.price || 0,
-    quantity: item?.quantity || 0,
+    price: item?.price?.toString() || '',
+    quantity: item?.quantity?.toString() || '',
   });
 
-  const [isNewCategory, setIsNewCategory] = useState(false);
+  const [isNewCategory, setIsNewCategory] = useState(categories.length === 0);
 
   const generateNewCode = () => {
     setFormData(prev => ({
@@ -610,8 +610,8 @@ function ItemModal({ item, categories, onClose, onSave }: { item: Item | null, c
     e.preventDefault();
     onSave({
       ...formData,
-      price: Number(formData.price),
-      quantity: Number(formData.quantity)
+      price: formData.price ? Number(formData.price) : 0,
+      quantity: formData.quantity ? Number(formData.quantity) : 0
     });
   };
 
