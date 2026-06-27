@@ -63,17 +63,22 @@ let postgresPool: pg.Pool | null = null;
 
 if (process.env.DATABASE_URL) {
   console.log("DATABASE_URL found! Connecting to Neon PostgreSQL...");
-  postgresPool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 5000,
-    query_timeout: 5000
-  });
-  
-  // Register error listener to prevent unhandled process crashes on idle client drops
-  postgresPool.on('error', (err) => {
-    console.error('Unexpected error on idle PostgreSQL client:', err);
-  });
+  try {
+    postgresPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      connectionTimeoutMillis: 5000,
+      query_timeout: 5000
+    });
+    
+    // Register error listener to prevent unhandled process crashes on idle client drops
+    postgresPool.on('error', (err) => {
+      console.error('Unexpected error on idle PostgreSQL client:', err);
+    });
+  } catch (err) {
+    console.error("Failed to initialize PostgreSQL pool:", err);
+    postgresPool = null;
+  }
 } else {
   console.log("No DATABASE_URL found. Using in-memory fallback.");
 }
@@ -814,8 +819,9 @@ async function startServer() {
   });
 
   // --- Vite Middleware for Development ---
-  if (process.env.NODE_ENV !== "production") {
-    const { createServer: createViteServer } = await import("vite");
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+    const vitePkg = "vi" + "te";
+    const { createServer: createViteServer } = await import(vitePkg as any);
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -829,7 +835,7 @@ async function startServer() {
     });
   }
 
-  if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+  if (!process.env.VERCEL) {
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://0.0.0.0:${PORT}`);
     });
@@ -840,6 +846,11 @@ async function startServer() {
 
 const appPromise = startServer();
 export default async function (req: any, res: any) {
-  const app = await appPromise;
-  app(req, res);
+  try {
+    const app = await appPromise;
+    app(req, res);
+  } catch (err: any) {
+    console.error("Critical error during server initialization:", err);
+    res.status(500).json({ error: "Internal Server Error", details: err.message });
+  }
 }

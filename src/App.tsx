@@ -39,9 +39,12 @@ function AppContent() {
             toast.error(data.type || "Koneksi ke database Neon PostgreSQL gagal.", "Database Error");
           }
           lastStatusRef.current = currentStatus;
+        } else {
+          setDbStatus({ connected: false, isFallback: false, type: `Gagal memuat status database (${res.status})` });
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to fetch database status:", err);
+        setDbStatus({ connected: false, isFallback: false, type: `Gagal memuat status database: ${err.message}` });
       }
     };
     fetchDbStatus();
